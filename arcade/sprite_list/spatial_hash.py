@@ -17,6 +17,7 @@ from arcade import (
     is_point_in_polygon,
     get_window,
 )
+from arcade.sprite import _SpriteType
 from .sprite_list import SpriteList
 
 LOG = logging.getLogger(__name__)
@@ -144,17 +145,17 @@ class _SpatialHash:
 
 
 def get_closest_sprite(
-    sprite: Sprite, sprite_list: "SpriteList"
-) -> Optional[Tuple[Sprite, float]]:
+    sprite: _SpriteType, sprite_list: "SpriteList"
+) -> Optional[Tuple[_SpriteType, float]]:
     """
     Given a Sprite and SpriteList, returns the closest sprite, and its distance.
 
-    :param Sprite sprite: Target sprite
+    :param _SpriteType sprite: Target sprite
     :param SpriteList sprite_list: List to search for closest sprite.
 
     :return: A tuple containing the closest sprite and the minimum distance.
              If the spritelist is empty we return ``None``.
-    :rtype: Optional[Tuple[Sprite, float]]
+    :rtype: Optional[Tuple[_SpriteType, float]]
     """
     if len(sprite_list) == 0:
         return None
@@ -169,7 +170,7 @@ def get_closest_sprite(
     return sprite_list[min_pos], min_distance
 
 
-def check_for_collision(sprite1: Sprite, sprite2: Sprite) -> bool:
+def check_for_collision(sprite1: _SpriteType, sprite2: _SpriteType) -> bool:
     """
     Check for a collision between two sprites.
 
@@ -193,12 +194,12 @@ def check_for_collision(sprite1: Sprite, sprite2: Sprite) -> bool:
     return _check_for_collision(sprite1, sprite2)
 
 
-def _check_for_collision(sprite1: Sprite, sprite2: Sprite) -> bool:
+def _check_for_collision(sprite1: _SpriteType, sprite2: _SpriteType) -> bool:
     """
     Check for collision between two sprites.
 
-    :param Sprite sprite1: Sprite 1
-    :param Sprite sprite2: Sprite 2
+    :param _SpriteType sprite1: Sprite 1
+    :param _SpriteType sprite2: Sprite 2
 
     :returns: True if sprites overlap.
     :rtype: bool
@@ -227,7 +228,7 @@ def _check_for_collision(sprite1: Sprite, sprite2: Sprite) -> bool:
     )
 
 
-def _get_nearby_sprites(sprite: Sprite, sprite_list: SpriteList):
+def _get_nearby_sprites(sprite: _SpriteType, sprite_list: SpriteList):
     sprite_count = len(sprite_list)
     if sprite_count == 0:
         return []
@@ -275,10 +276,10 @@ def _get_nearby_sprites(sprite: Sprite, sprite_list: SpriteList):
 
 
 def check_for_collision_with_list(
-    sprite: Sprite,
+    sprite: _SpriteType,
     sprite_list: SpriteList,
     method=0
-) -> List[Sprite]:
+) -> List[_SpriteType]:
     """
     Check for a collision between a sprite, and a list of sprites.
 
@@ -325,13 +326,13 @@ def check_for_collision_with_list(
     #             collision_list.append(sprite2)
 
 
-def check_for_collision_with_lists(sprite: Sprite,
+def check_for_collision_with_lists(sprite: _SpriteType,
                                    sprite_lists: Iterable[SpriteList],
-                                   method=1) -> List[Sprite]:
+                                   method=1) -> List[_SpriteType]:
     """
     Check for a collision between a Sprite, and a list of SpriteLists.
 
-    :param Sprite sprite: Sprite to check
+    :param _SpriteType sprite: Sprite to check
     :param List[SpriteList] sprite_lists: SpriteLists to check against
     :param int method: Collision check method. 1 is Spatial Hashing if available,
         2 is GPU based, 3 is slow CPU-bound check-everything. Defaults to 1.
@@ -364,7 +365,7 @@ def check_for_collision_with_lists(sprite: Sprite,
     return sprites
 
 
-def get_sprites_at_point(point: Point, sprite_list: SpriteList) -> List[Sprite]:
+def get_sprites_at_point(point: Point, sprite_list: SpriteList) -> List[_SpriteType]:
     """
     Get a list of sprites at a particular point. This function sees if any sprite overlaps
     the specified point. If a sprite has a different center_x/center_y but touches the point,
@@ -396,7 +397,7 @@ def get_sprites_at_point(point: Point, sprite_list: SpriteList) -> List[Sprite]:
     ]
 
 
-def get_sprites_at_exact_point(point: Point, sprite_list: SpriteList) -> List[Sprite]:
+def get_sprites_at_exact_point(point: Point, sprite_list: SpriteList) -> List[_SpriteType]:
     """
     Get a list of sprites whose center_x, center_y match the given point.
     This does NOT return sprites that overlap the point, the center has to be an exact match.

@@ -20,7 +20,6 @@ from typing import (
     Optional,
     Set,
     Tuple,
-    TypeVar,
     Union, Generic,
 )
 
@@ -32,14 +31,13 @@ from arcade import (
     float_to_byte_color,
     get_four_float_color,
 )
+from arcade.sprite import _SpriteType
 from arcade.context import ArcadeContext
 from arcade.gl.buffer import Buffer
 from arcade.gl.vertex_array import Geometry
 
 if TYPE_CHECKING:
     from arcade import Texture, TextureAtlas
-
-_SpriteType = TypeVar("_SpriteType", bound=Sprite)
 
 LOG = logging.getLogger(__name__)
 

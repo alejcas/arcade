@@ -21,6 +21,7 @@ from typing import (
     Dict,
     List,
     Optional,
+    TypeVar,
     TYPE_CHECKING,
 )
 
@@ -44,6 +45,9 @@ FACE_RIGHT = 1
 FACE_LEFT = 2
 FACE_UP = 3
 FACE_DOWN = 4
+
+
+_SpriteType = TypeVar("_SpriteType", bound="Sprite")
 
 
 class PyMunk:
