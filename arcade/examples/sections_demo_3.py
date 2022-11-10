@@ -206,7 +206,6 @@ class Map(Section):
         super().__init__(left, bottom, width, height, **kwargs)
 
         self.ball = Ball(20, COLOR_3)
-        a = self.ball.collides_with_list(arcade.SpriteList())
         self.ball.position = 60, 60
         self.sprite_list: arcade.SpriteList = arcade.SpriteList()
         self.sprite_list.append(self.ball)
