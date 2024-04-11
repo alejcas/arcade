@@ -7,6 +7,7 @@ from typing_extensions import Self
 from arcade.camera.orthographic import OrthographicProjector
 from arcade.camera.data_types import CameraData, OrthographicProjectionData, Projector
 from arcade.gl import Framebuffer
+from arcade.math import lerp_2d
 
 from arcade.window_commands import get_window
 if TYPE_CHECKING:
@@ -668,6 +669,36 @@ class Camera2D:
         """
         self._data.zoom = _zoom
 
+    @property
+    def position_goal(self) -> Tuple[float, float]:
+        """
+        Gets the camera goal position in 2D
+        This is the position the camera is moving towards
+        """
+        return self._data.position_goal[:2]
+
+    @position_goal.setter
+    def position_goal(self, goal: Tuple[float, float]) -> None:
+        """
+        Sets the camera goal position in 2D
+        This is the position the camera is moving towards
+        """
+        self._data.position_goal = (goal[0], goal[1], self._data.position_goal[2])
+
+    @property
+    def speed(self) -> float:
+        """
+        Gets rate of movement of the camera. The value goes from 1.0 (instant) to 0.0 (won't move)
+        """
+        return self._data.speed
+
+    @speed.setter
+    def speed(self, speed: float) -> None:
+        """
+        Sets rate of movement of the camera. The value goes from 1.0 (instant) to 0.0 (won't move)
+        """
+        self._data.speed = speed
+
     def equalise(self) -> None:
         """
         Forces the projection to match the size of the viewport.
@@ -691,6 +722,22 @@ class Camera2D:
         if and_projection:
             self.equalise()
 
+    def move(self, position: Tuple[float, float], speed: float = 1.0):
+        """
+        Moves the camera to a goal position at defined speed. Speed 1.0 is instant movement.
+        """
+        self.position_goal = position
+        self.speed = speed
+
+    def update_position(self):
+        """
+        Updates the camera position to follow the position goal at the fixed speed
+        """
+        if self.position != self.position_goal:
+            self.position = lerp_2d(self.position, self.position_goal, self.speed)
+            if int(self.position_goal[0] - self.position[0]) == 0 and int(self.position_goal[1] - self.position[1]) == 0:
+                self.position = self.position_goal
+
     def use(self) -> None:
         """
         Set internal projector as window projector,
@@ -699,6 +746,7 @@ class Camera2D:
 
         If you want to use a 'with' block use activate() instead.
         """
+        self.update_position()
         self.render_target.use()
         self._ortho_projector.use()
 

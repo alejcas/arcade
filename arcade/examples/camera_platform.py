@@ -93,6 +93,8 @@ class MyGame(arcade.Window):
             color=arcade.color.BLACK,
             font_size=14,
         )
+        self.manual_move = False
+
 
     def setup(self):
         """Set up the game and initialize the variables."""
@@ -222,6 +224,10 @@ class MyGame(arcade.Window):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player_sprite.change_x = 0
 
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        self.manual_move = True
+        self.camera.move((x, y), speed=0.05)
+
     def pan_camera_to_user(self, panning_fraction: float = 1.0):
         """
         Manage Scrolling
@@ -238,7 +244,8 @@ class MyGame(arcade.Window):
             screen_center_y = self.camera.viewport_height/2
         user_centered = screen_center_x, screen_center_y
 
-        self.camera.position = arcade.math.lerp_2d(self.camera.position, user_centered, panning_fraction)
+        self.camera.position_goal = user_centered
+        self.camera.speed = panning_fraction
 
     def on_update(self, delta_time):
         """Movement and game logic"""
@@ -267,7 +274,11 @@ class MyGame(arcade.Window):
             self.camera_shake.start()
 
         # Pan to the user
-        self.pan_camera_to_user(panning_fraction=0.12)
+        if not self.manual_move:
+            self.pan_camera_to_user(panning_fraction=0.5)
+        else:
+            if self.camera.position == self.camera.position_goal:
+                self.manual_move = False
 
         # Update score text
         self.text_score.text = f"Score: {self.score}"

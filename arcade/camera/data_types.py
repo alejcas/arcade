@@ -21,7 +21,7 @@ __all__ = [
 
 
 class CameraData:
-    """Stores position, orientation, and zoom for a camera.
+    """Stores position, speed and position goal for movement, orientation, and zoom for a camera.
 
     This is like where a camera is placed in 3D space.
 
@@ -32,9 +32,11 @@ class CameraData:
         zoom: A scaler that records the zoom of the camera. While this most often affects the projection matrix
               it allows camera controllers access to the zoom functionality
               without interacting with the projection data.
+        position_goal: A 3D vector which describes where the camera should go at a certain speed.
+        speed: the rate of movement from 1.0 (instant) to 0.0 (won't move)
     """
 
-    __slots__ = ("position", "up", "forward", "zoom")
+    __slots__ = ("position", "up", "forward", "zoom", "position_goal", "speed")
 
     def __init__(self,
                  position: Tuple[float, float, float] = (0.0, 0.0, 0.0),
@@ -49,6 +51,10 @@ class CameraData:
 
         # Zoom
         self.zoom: float = zoom
+
+        # Camera movement: goal position and speed
+        self.position_goal: Tuple[float, float, float] = position
+        self.speed: float = 1.0
 
     def __str__(self):
         return f"CameraData<{self.position=}, {self.up=}, {self.forward=}, {self.zoom=}>"
