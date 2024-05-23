@@ -997,7 +997,7 @@ class UISpace(UIWidget):
         surface.clear(self._color)
 
 
-class DynamicWidget(UIInteractiveWidget):
+class DynamicWidget(UIWidget):
     """
     A widget that will trigger render on every frame. This render only affects itself and child widgets.
     Provides on_draw method just like users expect as if they were drawing onto the window.
