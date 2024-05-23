@@ -277,18 +277,18 @@ class UIWidget(EventDispatcher, ABC):
 
     # TODO add padding, bg, border to constructor
     def __init__(
-        self,
-        *,
-        x: float = 0,
-        y: float = 0,
-        width: float = 100,
-        height: float = 100,
-        children: Iterable["UIWidget"] = tuple(),
-        # Properties which might be used by layouts
-        size_hint=None,  # in percentage
-        size_hint_min=None,  # in pixel
-        size_hint_max=None,  # in pixel
-        **kwargs,
+            self,
+            *,
+            x: float = 0,
+            y: float = 0,
+            width: float = 100,
+            height: float = 100,
+            children: Iterable["UIWidget"] = tuple(),
+            # Properties which might be used by layouts
+            size_hint=None,  # in percentage
+            size_hint_min=None,  # in pixel
+            size_hint_max=None,  # in pixel
+            **kwargs,
     ):
         self._requires_render = True
         self.rect = Rect(x, y, width, height)
@@ -588,13 +588,13 @@ class UIWidget(EventDispatcher, ABC):
         return self
 
     def with_padding(
-        self,
-        *,
-        top: Optional[int] = None,
-        right: Optional[int] = None,
-        bottom: Optional[int] = None,
-        left: Optional[int] = None,
-        all: Optional[int] = None,
+            self,
+            *,
+            top: Optional[int] = None,
+            right: Optional[int] = None,
+            bottom: Optional[int] = None,
+            left: Optional[int] = None,
+            all: Optional[int] = None,
     ) -> "UIWidget":
         """
         Changes the padding to the given values if set. Returns itself
@@ -613,10 +613,10 @@ class UIWidget(EventDispatcher, ABC):
         return self
 
     def with_background(
-        self,
-        *,
-        color: Union[None, Color] = ...,  # type: ignore
-        texture: Union[None, Texture, NinePatchTexture] = ...,  # type: ignore
+            self,
+            *,
+            color: Union[None, Color] = ...,  # type: ignore
+            texture: Union[None, Texture, NinePatchTexture] = ...,  # type: ignore
     ) -> "UIWidget":
         """
         Set widgets background.
@@ -701,17 +701,17 @@ class UIInteractiveWidget(UIWidget):
     disabled = Property(False)
 
     def __init__(
-        self,
-        *,
-        x: float = 0,
-        y: float = 0,
-        width: float,
-        height: float,
-        size_hint=None,
-        size_hint_min=None,
-        size_hint_max=None,
-        interaction_buttons=(arcade.MOUSE_BUTTON_LEFT,),
-        **kwargs,
+            self,
+            *,
+            x: float = 0,
+            y: float = 0,
+            width: float,
+            height: float,
+            size_hint=None,
+            size_hint_min=None,
+            size_hint_max=None,
+            interaction_buttons=(arcade.MOUSE_BUTTON_LEFT,),
+            **kwargs,
     ):
         super().__init__(
             x=x,
@@ -739,8 +739,8 @@ class UIInteractiveWidget(UIWidget):
             self.hovered = self.rect.collide_with_point(event.x, event.y)
 
         if (
-            isinstance(event, UIMousePressEvent)
-            and self.rect.collide_with_point(event.x, event.y)
+                isinstance(event, UIMousePressEvent)
+                and self.rect.collide_with_point(event.x, event.y)
                 and event.button in self.interaction_buttons
         ):
             self.pressed = True
@@ -789,16 +789,16 @@ class UIDummy(UIInteractiveWidget):
     """
 
     def __init__(
-        self,
-        *,
-        x=0,
-        y=0,
-        width=100,
-        height=100,
-        size_hint=None,
-        size_hint_min=None,
-        size_hint_max=None,
-        **kwargs,
+            self,
+            *,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+            size_hint=None,
+            size_hint_min=None,
+            size_hint_max=None,
+            **kwargs,
     ):
         super().__init__(
             x=x,
@@ -841,17 +841,17 @@ class UISpriteWidget(UIWidget):
     """
 
     def __init__(
-        self,
-        *,
-        x=0,
-        y=0,
-        width=100,
-        height=100,
-        sprite: Optional[Sprite] = None,
-        size_hint=None,
-        size_hint_min=None,
-        size_hint_max=None,
-        **kwargs,
+            self,
+            *,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+            sprite: Optional[Sprite] = None,
+            size_hint=None,
+            size_hint_min=None,
+            size_hint_max=None,
+            **kwargs,
     ):
         super().__init__(
             x=x,
@@ -960,17 +960,17 @@ class UISpace(UIWidget):
     """
 
     def __init__(
-        self,
-        *,
-        x=0,
-        y=0,
-        width=100,
-        height=100,
-        color=TRANSPARENT_BLACK,
-        size_hint=None,
-        size_hint_min=None,
-        size_hint_max=None,
-        **kwargs,
+            self,
+            *,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+            color=TRANSPARENT_BLACK,
+            size_hint=None,
+            size_hint_min=None,
+            size_hint_max=None,
+            **kwargs,
     ):
         super().__init__(
             x=x,
@@ -995,3 +995,45 @@ class UISpace(UIWidget):
     def do_render(self, surface: Surface):
         self.prepare_render(surface)
         surface.clear(self._color)
+
+
+class DynamicWidget(UIInteractiveWidget):
+    """
+    A widget that will trigger render on every frame. This render only affects itself and child widgets.
+    Provides on_draw method just like users expect as if they were drawing onto the window.
+    """
+
+    def on_event(self, event: UIEvent) -> Optional[bool]:
+        if isinstance(event, UIOnUpdateEvent):
+            # trigger render before on_update events
+            self.trigger_render()
+        return super().on_event(event)
+
+    def _do_render(self, surface: Surface, force=False) -> bool:
+        """Helper function to trigger :meth:`UIWidget.do_render` through the widget tree,
+        should only be used by UIManager!
+
+        :return: if this widget or a child was rendered
+        """
+        rendered = False
+
+        should_render = force or self._requires_render
+        if should_render and self.visible:
+            rendered = True
+            self.do_render_base(surface)
+            self.do_render(surface)
+            self.on_draw()  # inject on_draw here
+            self._requires_render = False
+
+        # only render children if self is visible
+        if self.visible:
+            for child in self.children:
+                rendered |= child._do_render(surface, should_render)
+
+        return rendered
+
+    def on_draw(self):
+        """
+        Called when this widget contents should draw
+        """
+        pass
